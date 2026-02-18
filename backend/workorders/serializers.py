@@ -4,15 +4,16 @@ from .models import WorkOrder, Event, JobAttachment, JobNote
 
 class EventSerializer(serializers.ModelSerializer):
     event_type_display = serializers.CharField(source='get_event_type_display', read_only=True)
+    client_name = serializers.CharField(source='work_order.client.name', read_only=True)
 
     class Meta:
         model = Event
         fields = [
             'id', 'work_order', 'event_type', 'event_type_display',
             'address', 'date', 'daily_order', 'scheduled_time',
-            'completed', 'completed_at', 'completed_by',
+            'completed', 'completed_at', 'completed_by', 'client_name',
         ]
-        read_only_fields = ['completed_at', 'completed_by']
+        read_only_fields = ['completed_at', 'completed_by', 'client_name']
 
 
 class JobAttachmentSerializer(serializers.ModelSerializer):

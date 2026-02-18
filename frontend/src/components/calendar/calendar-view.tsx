@@ -1,21 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useRef, useEffect, useState, type ComponentProps } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCalendarEvents } from "@/hooks/use-calendar";
 import { CardSkeleton } from "@/components/loading-skeleton";
+import CalendarInner from "./calendar-inner";
 import { format } from "date-fns";
-
-// Dynamic import avoids "Cannot read properties of null (reading 'cssRules')" with Turbopack
-const FullCalendar = dynamic(() => import("@fullcalendar/react"), {
-  ssr: false,
-  loading: () => <CardSkeleton />,
-});
-
-import dayGridPlugin from "@fullcalendar/daygrid";
-import listPlugin from "@fullcalendar/list";
-import interactionPlugin from "@fullcalendar/interaction";
 
 interface CalendarViewProps {
   initialView?: string;
@@ -53,36 +43,27 @@ export function CalendarView({
     },
   }));
 
+  const toolbar = headerToolbar || {
+    left: "prev,next today",
+    center: "title",
+    right: isMobile ? "" : "dayGridMonth,dayGridWeek,listWeek",
+  };
+
   return (
-    <FullCalendar
-      plugins={[dayGridPlugin, listPlugin, interactionPlugin]}
-      initialView={isMobile ? "listWeek" : initialView || "dayGridMonth"}
-      headerToolbar={
-        headerToolbar || {
-          left: "prev,next today",
-          center: "title",
-          right: isMobile
-            ? "listWeek,listMonth"
-            : "dayGridMonth,dayGridWeek,listWeek",
-        }
-      }
+    <CalendarInner
       events={calendarEvents}
+      initialView={initialView || "dayGridMonth"}
+      headerToolbar={toolbar}
       height={height}
-      eventClick={(info) => {
-        const woId = info.event.extendedProps.workOrderId;
-        if (woId) {
-          router.push(`/work-orders/${woId}`);
-        }
+      onEventClick={(woId) => {
+        if (woId) router.push(`/work-orders/${woId}`);
       }}
-      dateClick={(info) => {
-        router.push(`/calendar/day/${info.dateStr}`);
+      onDateClick={(dateStr) => {
+        router.push(`/calendar/day/${dateStr}`);
       }}
-      navLinks={true}
-      navLinkDayClick={(date) => {
+      onDayClick={(date) => {
         router.push(`/calendar/day/${format(date, "yyyy-MM-dd")}`);
       }}
-      dayMaxEvents={3}
-      nowIndicator={true}
     />
   );
 }

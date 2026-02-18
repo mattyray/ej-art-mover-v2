@@ -22,23 +22,26 @@ def calendar_events(request):
     data = []
     for event in events:
         wo = event.work_order
-        is_completed = event.completed or wo.status == 'completed'
-
         daily_prefix = f"{event.daily_order}. " if event.daily_order else ""
         title = f"{daily_prefix}{event.get_event_type_display()} - {wo.client.name}"
 
-        color = COMPLETED_COLOR if is_completed else COLORS[wo.id % len(COLORS)]
+        color = COMPLETED_COLOR if event.completed else COLORS[wo.id % len(COLORS)]
+
+        if event.scheduled_time:
+            start = f"{event.date.isoformat()}T{event.scheduled_time.strftime('%H:%M:%S')}"
+        else:
+            start = event.date.isoformat()
 
         data.append({
             'id': f"event_{event.id}",
             'title': title,
-            'start': event.date.isoformat(),
+            'start': start,
             'color': color,
             'workOrderId': wo.id,
             'dailyOrder': event.daily_order,
             'isEventCompleted': event.completed,
             'isWorkOrderCompleted': wo.status == 'completed',
-            'isCompleted': is_completed,
+            'isCompleted': event.completed,
         })
 
     return Response(data)

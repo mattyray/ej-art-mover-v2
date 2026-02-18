@@ -32,10 +32,12 @@ export function DayEventList({ events: initialEvents }: DayEventListProps) {
   const toggleComplete = useToggleEventComplete();
   const updateDailyOrder = useUpdateDailyOrder();
 
-  // Keep local state in sync when data refreshes
+  // Keep local state in sync when data refreshes (length, order, or completion changes)
   if (
     initialEvents.length !== events.length ||
-    initialEvents.some((e, i) => e.id !== events[i]?.id)
+    initialEvents.some(
+      (e, i) => e.id !== events[i]?.id || e.completed !== events[i]?.completed
+    )
   ) {
     setEvents(initialEvents);
   }

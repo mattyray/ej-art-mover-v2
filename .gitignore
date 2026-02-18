@@ -31,3 +31,6 @@ Thumbs.db
 
 # Docker
 postgres_data/
+
+# Database dumps
+*.dump

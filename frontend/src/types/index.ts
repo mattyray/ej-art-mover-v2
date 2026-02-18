@@ -119,6 +119,7 @@ export interface Event {
   completed: boolean;
   completed_at: string | null;
   completed_by: string;
+  client_name: string;
 }
 
 export type EventInput = {

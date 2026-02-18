@@ -87,7 +87,7 @@ class WorkOrderViewSet(viewsets.ModelViewSet):
 
 
 class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.select_related('work_order').all()
+    queryset = Event.objects.select_related('work_order__client').all()
     serializer_class = EventSerializer
 
     def get_queryset(self):
@@ -112,6 +112,20 @@ class EventViewSet(viewsets.ModelViewSet):
             event.completed_at = timezone.now()
             event.completed_by = request.user.username
         event.save()
+
+        # Recalculate work order status based on event states
+        wo = event.work_order
+        if not event.completed and wo.status == 'completed':
+            # An event was unchecked — revert work order to in_progress
+            wo.status = 'in_progress'
+            wo.completed_at = None
+            wo.save()
+        elif event.completed and wo.events.filter(completed=False).count() == 0:
+            # All events are now completed — mark work order completed
+            wo.status = 'completed'
+            wo.completed_at = timezone.now()
+            wo.save()
+
         return Response({
             'completed': event.completed,
             'completed_at': event.completed_at,

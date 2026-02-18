@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { StatusBadge, InvoicedBadge } from "@/components/status-badge";
 import { DetailSkeleton } from "@/components/loading-skeleton";
@@ -9,6 +10,7 @@ import { EventList } from "@/components/work-orders/event-list";
 import { AttachmentGrid } from "@/components/work-orders/attachment-grid";
 import { NoteList } from "@/components/work-orders/note-list";
 import { WorkOrderActions } from "@/components/work-orders/work-order-actions";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
@@ -17,6 +19,7 @@ import {
 } from "@/components/ui/collapsible";
 import { useWorkOrder } from "@/hooks/use-work-orders";
 import {
+  ArrowLeft,
   CalendarDays,
   Paperclip,
   MessageSquare,
@@ -31,6 +34,7 @@ export default function WorkOrderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
   const workOrderId = Number(id);
   const { data: workOrder, isLoading } = useWorkOrder(workOrderId);
 
@@ -39,6 +43,16 @@ export default function WorkOrderDetailPage({
 
   return (
     <div className="space-y-6">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="gap-1"
+        onClick={() => router.back()}
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </Button>
+
       <PageHeader
         title={`Work Order #${workOrder.id}`}
         subtitle={

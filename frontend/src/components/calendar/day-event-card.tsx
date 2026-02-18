@@ -1,14 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { GripVertical, Clock, MapPin } from "lucide-react";
+import { ChevronRight, GripVertical, Clock, MapPin } from "lucide-react";
 import { EVENT_TYPE_LABELS } from "@/lib/constants";
 import type { Event } from "@/types";
-import Link from "next/link";
 
 interface DayEventCardProps {
   event: Event;
@@ -16,6 +16,7 @@ interface DayEventCardProps {
 }
 
 export function DayEventCard({ event, onToggleComplete }: DayEventCardProps) {
+  const router = useRouter();
   const {
     attributes,
     listeners,
@@ -32,10 +33,10 @@ export function DayEventCard({ event, onToggleComplete }: DayEventCardProps) {
   };
 
   return (
-    <Card ref={setNodeRef} style={style} className="touch-none">
+    <Card ref={setNodeRef} style={style}>
       <CardContent className="flex items-start gap-3 p-3">
         <button
-          className="mt-1 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
+          className="mt-1 touch-none cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground"
           {...attributes}
           {...listeners}
         >
@@ -48,17 +49,17 @@ export function DayEventCard({ event, onToggleComplete }: DayEventCardProps) {
           className="mt-1"
         />
 
-        <div className="flex-1 min-w-0 space-y-1">
+        <div
+          className="flex-1 min-w-0 space-y-1 cursor-pointer"
+          onClick={() => router.push(`/work-orders/${event.work_order}`)}
+        >
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="outline" className="text-xs">
               {EVENT_TYPE_LABELS[event.event_type]}
             </Badge>
-            <Link
-              href={`/work-orders/${event.work_order}`}
-              className="text-sm font-medium hover:underline truncate"
-            >
-              WO #{event.work_order}
-            </Link>
+            <span className="text-sm font-medium truncate">
+              {event.client_name}
+            </span>
           </div>
 
           {event.address && (
@@ -81,6 +82,8 @@ export function DayEventCard({ event, onToggleComplete }: DayEventCardProps) {
             </p>
           )}
         </div>
+
+        <ChevronRight className="h-4 w-4 mt-1 shrink-0 text-muted-foreground" />
       </CardContent>
     </Card>
   );
