@@ -73,4 +73,67 @@ The database can be migrated via `pg_dump` / `pg_restore` from the original Hero
 
 ---
 
-*More entries will be added as we build each phase.*
+## 2026-02-18 — Full Frontend Build (Phases 0–9)
+
+### The Sprint
+Built the entire frontend in a single session — all 9 phases, ~80 files, from bare Next.js scaffold to a complete working app.
+
+### Phase-by-Phase Highlights
+
+**Phases 0–3: Foundation**
+- Installed 30+ packages, initialized shadcn/ui with 25 components
+- Built JWT auth flow with Axios interceptors (auto-refresh, request queuing)
+- Mobile-first app shell: bottom tab bar with iOS safe area support, desktop sidebar
+- TanStack Query hooks for every API endpoint with proper cache invalidation
+
+**Phase 4: Clients (Pattern Setter)**
+- Searchable client list with cards on mobile, table on desktop
+- Reusable client select (combobox) with inline "create new" option
+- Established the React Hook Form + Zod + shadcn Form pattern used everywhere after
+
+**Phases 5–6: Work Orders (The Core)**
+- Collapsible status sections (Pending, Scheduled, Completed)
+- Detail page with inline event completion toggles, attachment uploads, note CRUD
+- Complex create/edit form with `useFieldArray` for dynamic event management
+- Three submit actions: Save, Save & Complete, Save & Invoice
+
+**Phase 7: Dashboard & Calendar**
+- FullCalendar with responsive views — list on mobile, month grid on desktop
+- Day view with @dnd-kit drag-and-drop for event reordering
+- Daily order persistence to backend on drop
+- Previous/next day navigation
+
+**Phase 8: Invoices**
+- Isolated module — all invoice code in ~8 files
+- Status flow: Unpaid → In QuickBooks → Paid
+- Work order select filtered to completed, uninvoiced WOs for selected client
+- Supports `?work_order=` URL param for complete-and-invoice flow
+
+**Phase 9: Polish**
+- Error boundaries at global and route-group levels
+- Custom 404 page
+- Reusable pagination component
+- iOS viewport-fit: cover for notch/home bar support
+
+### Lessons Learned
+1. **Zod v4 broke `required_error`** — it's now `error` in the options object. Caught by TypeScript at build time.
+2. **Zod `.optional().default()` creates mismatched input/output types** — causes zodResolver type errors with useForm. Better to use plain required types and set defaults in the form's `defaultValues`.
+3. **shadcn init flags changed** — `--style` flag removed in newer versions, use `npx shadcn@latest init -d`.
+4. **Hooks containing JSX need `.tsx` extension** — AuthContext.Provider is JSX, so `use-auth.ts` → `use-auth.tsx`.
+
+### Architecture Patterns That Worked Well
+- **`(authenticated)` route group** — clean separation between login and the nav shell
+- **FormProvider + useFormContext** — nested form components (EventFormRow) access parent form without prop drilling
+- **Actions pattern** — build action array based on entity state, render once for desktop (dropdown) and once for mobile (drawer)
+- **Separate queries per section** — each collapsible status section has its own TanStack Query, independent loading states
+- **@dnd-kit with optimistic local state** — reorder happens visually immediately, API call fires in background
+
+### What's Next
+- Load the production database from the original Heroku app via `pg_dump` / `pg_restore`
+- End-to-end testing with real data
+- Responsive QA at 375px, 768px, 1280px
+- Deploy: backend to Railway, frontend to Netlify
+
+---
+
+*All 9 phases complete. Frontend is fully built and ready for integration testing.*
