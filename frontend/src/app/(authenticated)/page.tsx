@@ -1,20 +1,49 @@
 "use client";
 
+import Link from "next/link";
 import { PageHeader } from "@/components/layout/page-header";
+import { CalendarView } from "@/components/calendar/calendar-view";
 import { Card, CardContent } from "@/components/ui/card";
-import { CalendarDays } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plus, Users, ClipboardList, FileText } from "lucide-react";
 
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Dashboard" />
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+          <Link href="/work-orders/new">
+            <ClipboardList className="h-5 w-5" />
+            <span className="text-xs">New Work Order</span>
+          </Link>
+        </Button>
+        <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+          <Link href="/clients/new">
+            <Users className="h-5 w-5" />
+            <span className="text-xs">New Client</span>
+          </Link>
+        </Button>
+        <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+          <Link href="/invoices/new">
+            <FileText className="h-5 w-5" />
+            <span className="text-xs">New Invoice</span>
+          </Link>
+        </Button>
+        <Button variant="outline" className="h-auto py-3 flex-col gap-1" asChild>
+          <Link href="/work-orders">
+            <Plus className="h-5 w-5" />
+            <span className="text-xs">All Jobs</span>
+          </Link>
+        </Button>
+      </div>
+
+      {/* Calendar */}
       <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <CalendarDays className="h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-lg font-medium">Calendar coming in Phase 7</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            The full dashboard with FullCalendar will be built here.
-          </p>
+        <CardContent className="p-2 sm:p-4">
+          <CalendarView height="auto" />
         </CardContent>
       </Card>
     </div>
