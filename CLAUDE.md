@@ -89,6 +89,21 @@ ej-artmover-v2/
 - React Hook Form + Zod validation
 - TanStack Query v5 for server state management
 - Toast notifications (sonner)
+- Back button on work order detail page (router.back)
+- Day event cards show client name, tappable to navigate to work order, with chevron indicator
+- Event completion toggle recalculates work order status (auto-complete/revert)
+- Calendar color based on individual event completion, not work order status
+- Calendar includes scheduled_time in start field (timed events vs all-day)
+
+### Backend Enhancements (since initial build)
+- `EventSerializer` includes `client_name` (via `work_order.client.name`)
+- `EventViewSet` uses `select_related('work_order__client')` for efficient queries
+- `toggle_complete` action recalculates work order status:
+  - Unchecking an event on a completed WO → reverts WO to in_progress
+  - Checking the last event → auto-marks WO as completed
+- `NestedEventSerializer` for work order create/update (excludes `work_order` field)
+- Calendar endpoint includes `scheduled_time` in event start field
+- Calendar color based on `event.completed` only (not `wo.status`)
 
 ## API Endpoints
 
@@ -139,7 +154,7 @@ All endpoints require JWT Bearer token (except auth endpoints).
 - **Auth:** JWT via SimpleJWT with axios interceptors for automatic token refresh
 - **State management:** TanStack Query v5 for server state, React context for auth
 - **API client:** Axios with JWT interceptor (`src/lib/api.ts`)
-- **Calendar:** FullCalendar React component (dynamically imported for Turbopack compatibility)
+- **Calendar:** FullCalendar React component (split into CalendarView + CalendarInner; dev uses webpack not Turbopack due to FullCalendar CSS incompatibility)
 - **Drag-and-drop:** @dnd-kit for calendar day view event reordering
 - **Forms:** React Hook Form + Zod v4 + @hookform/resolvers
 - **UI components:** shadcn/ui (Radix primitives + Tailwind CSS v4)
