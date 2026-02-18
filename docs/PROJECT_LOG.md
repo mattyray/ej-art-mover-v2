@@ -128,12 +128,58 @@ Built the entire frontend in a single session — all 9 phases, ~80 files, from 
 - **Separate queries per section** — each collapsible status section has its own TanStack Query, independent loading states
 - **@dnd-kit with optimistic local state** — reorder happens visually immediately, API call fires in background
 
-### What's Next
-- Load the production database from the original Heroku app via `pg_dump` / `pg_restore`
-- End-to-end testing with real data
-- Responsive QA at 375px, 768px, 1280px
-- Deploy: backend to Railway, frontend to Netlify
+---
+
+## 2026-02-18 — Phase 10: Form Polish & Bug Fixes
+
+### What Changed
+After loading production data via `pg_dump`, tested the entire app end-to-end on mobile. Found and fixed a batch of real-world issues:
+
+- **Phone auto-formatting:** `(555) 555-5555` format — custom `PhoneInput` component, formats as you type, handles paste
+- **Google Places autocomplete:** On all address fields (client form + event form). Had to fight Radix Dialog's `pointer-events: none` on body — Places dropdown was getting blocked. Fixed with capture-phase pointerdown listener.
+- **Currency input:** `type="number"` produced floating-point artifacts like `11.00292393483902039`. Replaced with custom `CurrencyInput` using `type="text"` and manual decimal restriction.
+- **Inline client creation:** "Create New Client" dialog in work order form. Newly created client wasn't populating the dropdown — added `useClient` fallback fetch.
+- **Clickable table rows:** Clients, work orders, and invoices list pages now navigate on row click (not just link text).
+- **Work order POST 400 fix:** `EventSerializer` required `work_order` field during nested creation. Created `NestedEventSerializer` that excludes it.
 
 ---
 
-*All 9 phases complete. Frontend is fully built and ready for integration testing.*
+## 2026-02-18 — Calendar UX Overhaul
+
+### The Problem
+Testing on mobile revealed the calendar was confusing to navigate — no clear flow between month view, day view, and work order details. Events showed "WO #780" instead of client names. Checkboxes couldn't be tapped. Completed events stayed gray even after unchecking.
+
+### What Changed
+
+**Navigation flow (mobile):**
+- Calendar month grid → tap day → Day View → tap event card → Work Order Detail
+- Back button on work order detail (router.back) returns to wherever you came from
+- Removed Month/List toggle on mobile — just the month grid, cleaner UX
+- Day event cards show **client name** instead of "WO #780", entire card tappable with chevron indicator
+
+**Event completion:**
+- `touch-none` was on the entire Card (for drag-and-drop) — blocked all touch events including checkboxes. Moved to just the drag handle.
+- `DayEventList` sync check only compared IDs, not `completed` status — UI didn't update after toggle. Fixed.
+- Calendar color now based on individual `event.completed`, not `wo.status == 'completed'`
+- `toggle_complete` now recalculates work order status: uncheck an event on a completed WO → reverts to in_progress; check the last event → auto-completes WO
+
+**FullCalendar + Turbopack:**
+- FullCalendar CSS injection reads `document.styleSheets[n].cssRules` during module evaluation, which is null under Turbopack. No amount of `dynamic()` or `useEffect` imports fixes this.
+- Split calendar into `CalendarView` (data/routing) + `CalendarInner` (FullCalendar + plugins)
+- Switched dev server to `next dev --webpack` — Turbopack is simply incompatible with FullCalendar v6
+- Added `transpilePackages` for all `@fullcalendar/*` packages in next.config.ts
+
+### Lessons Learned
+1. **Turbopack is not universal** — if a library manipulates CSS at module eval time, Turbopack may break it. Have `--webpack` as a fallback.
+2. **`touch-none` is contagious** — putting it on a parent element blocks ALL touch events on children, not just drag gestures. Scope it to the drag handle only.
+3. **Local state for DnD needs careful sync** — when you maintain local state for drag-and-drop ordering, your sync check must cover ALL fields that can change, not just array structure.
+4. **Radix Dialog is aggressive** — it blocks all interactions outside the dialog via `pointer-events: none` on body. Google Places dropdown renders as a sibling, not inside the dialog. Need capture-phase event listener tricks to work around it.
+
+### What's Next
+- Deploy: backend to Railway, frontend to Netlify
+- Remaining QA with production data
+- PDF viewing (backend endpoints exist, frontend needs inline viewer)
+
+---
+
+*Phases 0-10 complete plus calendar UX overhaul. App is fully functional with production data.*
