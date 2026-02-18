@@ -1,0 +1,248 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import {
+  useMarkCompleted,
+  useMarkPaid,
+  useCompleteAndInvoice,
+  useResetInvoiced,
+  useDeleteWorkOrder,
+} from "@/hooks/use-work-orders";
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  CheckCircle,
+  Receipt,
+  RotateCcw,
+} from "lucide-react";
+import type { WorkOrderDetail } from "@/types";
+
+interface WorkOrderActionsProps {
+  workOrder: WorkOrderDetail;
+}
+
+export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
+  const router = useRouter();
+  const markCompleted = useMarkCompleted();
+  const markPaid = useMarkPaid();
+  const completeAndInvoice = useCompleteAndInvoice();
+  const resetInvoiced = useResetInvoiced();
+  const deleteWorkOrder = useDeleteWorkOrder();
+
+  const { id, status, invoiced } = workOrder;
+
+  function handleMarkCompleted() {
+    markCompleted.mutate(id, {
+      onSuccess: () => router.refresh(),
+    });
+  }
+
+  function handleCompleteAndInvoice() {
+    completeAndInvoice.mutate(id, {
+      onSuccess: () => router.push(`/invoices/new?work_order=${id}`),
+    });
+  }
+
+  function handleMarkPaid() {
+    markPaid.mutate(id);
+  }
+
+  function handleResetInvoiced() {
+    resetInvoiced.mutate(id);
+  }
+
+  function handleDelete() {
+    deleteWorkOrder.mutate(id, {
+      onSuccess: () => router.push("/work-orders"),
+    });
+  }
+
+  // Build action list based on current state
+  const actions: {
+    label: string;
+    icon: React.ReactNode;
+    onClick?: () => void;
+    href?: string;
+    variant?: "destructive";
+    confirm?: { title: string; description: string };
+  }[] = [];
+
+  actions.push({
+    label: "Edit",
+    icon: <Pencil className="h-4 w-4" />,
+    href: `/work-orders/${id}/edit`,
+  });
+
+  if (status !== "completed") {
+    actions.push({
+      label: "Mark Completed",
+      icon: <CheckCircle className="h-4 w-4" />,
+      onClick: handleMarkCompleted,
+    });
+    actions.push({
+      label: "Complete & Invoice",
+      icon: <Receipt className="h-4 w-4" />,
+      onClick: handleCompleteAndInvoice,
+    });
+  }
+
+  if (status === "completed" && !invoiced) {
+    actions.push({
+      label: "Create Invoice",
+      icon: <Receipt className="h-4 w-4" />,
+      href: `/invoices/new?work_order=${id}`,
+    });
+    actions.push({
+      label: "Mark Invoiced",
+      icon: <CheckCircle className="h-4 w-4" />,
+      onClick: handleMarkPaid,
+    });
+  }
+
+  if (status === "completed" && invoiced) {
+    actions.push({
+      label: "Reset Invoiced",
+      icon: <RotateCcw className="h-4 w-4" />,
+      onClick: handleResetInvoiced,
+    });
+  }
+
+  const deleteAction = {
+    label: "Delete",
+    icon: <Trash2 className="h-4 w-4" />,
+    variant: "destructive" as const,
+    confirm: {
+      title: "Delete Work Order",
+      description: `This will permanently delete Work Order #${id} including all events, attachments, and notes.`,
+    },
+  };
+
+  return (
+    <>
+      {/* Desktop: Dropdown */}
+      <div className="hidden md:block">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              Actions
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {actions.map((action) =>
+              action.href ? (
+                <DropdownMenuItem key={action.label} asChild>
+                  <Link href={action.href} className="gap-2">
+                    {action.icon}
+                    {action.label}
+                  </Link>
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem
+                  key={action.label}
+                  onClick={action.onClick}
+                  className="gap-2"
+                >
+                  {action.icon}
+                  {action.label}
+                </DropdownMenuItem>
+              )
+            )}
+            <DropdownMenuSeparator />
+            <ConfirmDialog
+              trigger={
+                <DropdownMenuItem
+                  onSelect={(e) => e.preventDefault()}
+                  className="gap-2 text-destructive focus:text-destructive"
+                >
+                  {deleteAction.icon}
+                  {deleteAction.label}
+                </DropdownMenuItem>
+              }
+              title={deleteAction.confirm.title}
+              description={deleteAction.confirm.description}
+              confirmLabel="Delete"
+              variant="destructive"
+              onConfirm={handleDelete}
+            />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Mobile: Drawer */}
+      <div className="md:hidden">
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button variant="outline" size="icon">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerTitle>Work Order Actions</DrawerTitle>
+            </DrawerHeader>
+            <div className="space-y-1 px-4 pb-8">
+              {actions.map((action) =>
+                action.href ? (
+                  <Link key={action.label} href={action.href}>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start gap-3 py-3"
+                    >
+                      {action.icon}
+                      {action.label}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    key={action.label}
+                    variant="ghost"
+                    className="w-full justify-start gap-3 py-3"
+                    onClick={action.onClick}
+                  >
+                    {action.icon}
+                    {action.label}
+                  </Button>
+                )
+              )}
+              <ConfirmDialog
+                trigger={
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-3 py-3 text-destructive hover:text-destructive"
+                  >
+                    {deleteAction.icon}
+                    {deleteAction.label}
+                  </Button>
+                }
+                title={deleteAction.confirm.title}
+                description={deleteAction.confirm.description}
+                confirmLabel="Delete"
+                variant="destructive"
+                onConfirm={handleDelete}
+              />
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </div>
+    </>
+  );
+}
