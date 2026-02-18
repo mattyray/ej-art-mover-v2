@@ -8,6 +8,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AddressAutocomplete } from "@/components/ui/address-autocomplete";
 import {
   Select,
   SelectContent,
@@ -77,7 +78,7 @@ export function EventFormRow({ index, onRemove }: EventFormRowProps) {
             <FormItem>
               <FormLabel className="text-xs">Address</FormLabel>
               <FormControl>
-                <Input placeholder="Address" {...field} />
+                <AddressAutocomplete {...field} />
               </FormControl>
             </FormItem>
           )}

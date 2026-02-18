@@ -124,3 +124,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Google Places autocomplete dropdown above Radix dialog portals.
+   pointer-events: auto overrides Radix Dialog's body pointer-events: none in modal mode. */
+.pac-container {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}

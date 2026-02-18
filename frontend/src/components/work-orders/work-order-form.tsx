@@ -20,6 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Plus } from "lucide-react";
 import type { WorkOrderDetail } from "@/types";
 
@@ -115,19 +116,11 @@ export function WorkOrderForm({
             <FormItem>
               <FormLabel>Estimated Cost</FormLabel>
               <FormControl>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                    $
-                  </span>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    className="pl-7"
-                    {...field}
-                  />
-                </div>
+                <CurrencyInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  ref={field.ref}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

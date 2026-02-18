@@ -10,6 +10,7 @@ import { ClientSelect } from "@/components/clients/client-select";
 import { WorkOrderSelect } from "./work-order-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
@@ -133,19 +134,11 @@ export function InvoiceForm({
             <FormItem>
               <FormLabel>Amount *</FormLabel>
               <FormControl>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                    $
-                  </span>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    className="pl-7"
-                    {...field}
-                  />
-                </div>
+                <CurrencyInput
+                  value={field.value}
+                  onChange={field.onChange}
+                  ref={field.ref}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

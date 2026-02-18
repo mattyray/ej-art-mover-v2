@@ -5,6 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { clientSchema, type ClientFormValues } from "@/lib/validations/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { AddressAutocomplete } from "@/components/ui/address-autocomplete";
+import { formatPhone } from "@/lib/phone";
 import {
   Form,
   FormControl,
@@ -33,7 +36,7 @@ export function ClientForm({
     defaultValues: {
       name: defaultValues?.name || "",
       email: defaultValues?.email || "",
-      phone: defaultValues?.phone || "",
+      phone: formatPhone(defaultValues?.phone) || "",
       address: defaultValues?.address || "",
       billing_address: defaultValues?.billing_address || "",
     },
@@ -81,7 +84,7 @@ export function ClientForm({
             <FormItem>
               <FormLabel>Phone</FormLabel>
               <FormControl>
-                <Input type="tel" placeholder="(555) 555-5555" {...field} />
+                <PhoneInput {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,7 +98,7 @@ export function ClientForm({
             <FormItem>
               <FormLabel>Service Address</FormLabel>
               <FormControl>
-                <Input placeholder="123 Main St, City, State" {...field} />
+                <AddressAutocomplete {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,7 +112,7 @@ export function ClientForm({
             <FormItem>
               <FormLabel>Billing Address</FormLabel>
               <FormControl>
-                <Input placeholder="123 Main St, City, State" {...field} />
+                <AddressAutocomplete {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

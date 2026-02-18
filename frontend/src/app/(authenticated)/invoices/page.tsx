@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { InvoiceCard } from "@/components/invoices/invoice-card";
 import { ListSkeleton } from "@/components/loading-skeleton";
@@ -38,6 +39,7 @@ function InvoiceSection({
   status: InvoiceStatus;
   label: string;
 }) {
+  const router = useRouter();
   const { data, isLoading } = useInvoices({ status });
   const invoices: Invoice[] = data?.results ?? [];
 
@@ -74,14 +76,13 @@ function InvoiceSection({
             </TableHeader>
             <TableBody>
               {invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell>
-                    <Link
-                      href={`/invoices/${invoice.id}`}
-                      className="font-medium hover:underline"
-                    >
-                      {invoice.invoice_number || `#${invoice.id}`}
-                    </Link>
+                <TableRow
+                  key={invoice.id}
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/invoices/${invoice.id}`)}
+                >
+                  <TableCell className="font-medium">
+                    {invoice.invoice_number || `#${invoice.id}`}
                   </TableCell>
                   <TableCell>{invoice.client_name}</TableCell>
                   <TableCell>${invoice.amount}</TableCell>

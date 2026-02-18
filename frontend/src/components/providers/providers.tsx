@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { GoogleMapsProvider } from "@/components/providers/google-maps-provider";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -24,10 +25,12 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          {children}
-          <Toaster richColors position="bottom-right" />
-        </TooltipProvider>
+        <GoogleMapsProvider>
+          <TooltipProvider>
+            {children}
+            <Toaster richColors position="bottom-right" />
+          </TooltipProvider>
+        </GoogleMapsProvider>
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { WorkOrderCard } from "@/components/work-orders/work-order-card";
 import { EmptyState } from "@/components/empty-state";
@@ -37,6 +38,7 @@ function WorkOrderSection({
   isLoading: boolean;
   defaultOpen?: boolean;
 }) {
+  const router = useRouter();
   if (isLoading) return <ListSkeleton count={2} />;
 
   return (
@@ -78,14 +80,13 @@ function WorkOrderSection({
                 </TableHeader>
                 <TableBody>
                   {workOrders.map((wo) => (
-                    <TableRow key={wo.id}>
-                      <TableCell>
-                        <Link
-                          href={`/work-orders/${wo.id}`}
-                          className="font-medium hover:underline"
-                        >
-                          #{wo.id}
-                        </Link>
+                    <TableRow
+                      key={wo.id}
+                      className="cursor-pointer"
+                      onClick={() => router.push(`/work-orders/${wo.id}`)}
+                    >
+                      <TableCell className="font-medium">
+                        #{wo.id}
                       </TableCell>
                       <TableCell>{wo.client_name}</TableCell>
                       <TableCell className="max-w-xs truncate text-muted-foreground">

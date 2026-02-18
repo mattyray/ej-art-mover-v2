@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -33,11 +34,43 @@ export function ClientCreateDialog({
     });
   }
 
+  // Track whether a pac-container click just happened so onOpenChange can block dismiss
+  const pacClickedRef = React.useRef(false);
+
+  React.useEffect(() => {
+    // Capture pointerdown on pac-container BEFORE Radix processes it
+    function handlePointerDown(e: PointerEvent) {
+      if ((e.target as HTMLElement)?.closest?.(".pac-container")) {
+        pacClickedRef.current = true;
+        // Reset after a tick so normal closes aren't blocked
+        setTimeout(() => { pacClickedRef.current = false; }, 300);
+      }
+    }
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => document.removeEventListener("pointerdown", handlePointerDown, true);
+  }, []);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <Dialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        if (!newOpen && pacClickedRef.current) return;
+        onOpenChange(newOpen);
+      }}
+    >
+      <DialogContent
+        onPointerDownOutside={(e) => {
+          if (pacClickedRef.current) e.preventDefault();
+        }}
+        onInteractOutside={(e) => {
+          if (pacClickedRef.current) e.preventDefault();
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Create New Client</DialogTitle>
+          <DialogDescription className="sr-only">
+            Fill out the form below to create a new client.
+          </DialogDescription>
         </DialogHeader>
         <ClientForm
           onSubmit={handleSubmit}

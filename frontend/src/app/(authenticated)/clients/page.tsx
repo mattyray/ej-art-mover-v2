@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { SearchInput } from "@/components/search-input";
 import { ClientCard } from "@/components/clients/client-card";
@@ -22,6 +23,7 @@ import { useClients } from "@/hooks/use-clients";
 import { Plus, Users, ClipboardList } from "lucide-react";
 
 export default function ClientsPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const { data, isLoading } = useClients(search || undefined);
 
@@ -91,14 +93,13 @@ export default function ClientsPage() {
               </TableHeader>
               <TableBody>
                 {clients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell>
-                      <Link
-                        href={`/clients/${client.id}`}
-                        className="font-medium hover:underline"
-                      >
-                        {client.name}
-                      </Link>
+                  <TableRow
+                    key={client.id}
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/clients/${client.id}`)}
+                  >
+                    <TableCell className="font-medium">
+                      {client.name}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {client.email || "—"}

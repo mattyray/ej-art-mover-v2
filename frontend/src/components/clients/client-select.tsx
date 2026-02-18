@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useClients } from "@/hooks/use-clients";
+import { useClients, useClient } from "@/hooks/use-clients";
 
 interface ClientSelectProps {
   value?: number;
@@ -36,7 +36,10 @@ export function ClientSelect({
   const { data } = useClients(search);
 
   const clients = data?.results || [];
-  const selectedClient = clients.find((c) => c.id === value);
+  const clientInList = clients.find((c) => c.id === value);
+  // If value is set but not in the current paginated list, fetch it directly
+  const { data: fetchedClient } = useClient(value && !clientInList ? value : 0);
+  const selectedClient = clientInList || (fetchedClient?.id === value ? fetchedClient : undefined);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

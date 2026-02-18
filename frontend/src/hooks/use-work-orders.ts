@@ -45,11 +45,19 @@ export function useWorkOrder(id: number) {
   });
 }
 
+function cleanWorkOrderInput(input: WorkOrderInput) {
+  return {
+    ...input,
+    estimated_cost: input.estimated_cost || null,
+    job_description: input.job_description || null,
+  };
+}
+
 export function useCreateWorkOrder() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (input: WorkOrderInput) => {
-      const { data } = await api.post<WorkOrderDetail>("/workorders/", input);
+      const { data } = await api.post<WorkOrderDetail>("/workorders/", cleanWorkOrderInput(input));
       return data;
     },
     onSuccess: () => {
@@ -69,7 +77,7 @@ export function useUpdateWorkOrder() {
     mutationFn: async ({ id, ...input }: WorkOrderInput & { id: number }) => {
       const { data } = await api.put<WorkOrderDetail>(
         `/workorders/${id}/`,
-        input
+        cleanWorkOrderInput(input)
       );
       return data;
     },

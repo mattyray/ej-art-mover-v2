@@ -1,14 +1,21 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import listPlugin from "@fullcalendar/list";
-import interactionPlugin from "@fullcalendar/interaction";
+import dynamic from "next/dynamic";
+import { useRef, useEffect, useState, type ComponentProps } from "react";
 import { useRouter } from "next/navigation";
 import { useCalendarEvents } from "@/hooks/use-calendar";
 import { CardSkeleton } from "@/components/loading-skeleton";
 import { format } from "date-fns";
+
+// Dynamic import avoids "Cannot read properties of null (reading 'cssRules')" with Turbopack
+const FullCalendar = dynamic(() => import("@fullcalendar/react"), {
+  ssr: false,
+  loading: () => <CardSkeleton />,
+});
+
+import dayGridPlugin from "@fullcalendar/daygrid";
+import listPlugin from "@fullcalendar/list";
+import interactionPlugin from "@fullcalendar/interaction";
 
 interface CalendarViewProps {
   initialView?: string;
@@ -23,7 +30,6 @@ export function CalendarView({
 }: CalendarViewProps) {
   const router = useRouter();
   const { data: events, isLoading } = useCalendarEvents();
-  const calendarRef = useRef<FullCalendar>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -32,16 +38,6 @@ export function CalendarView({
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
-
-  useEffect(() => {
-    const api = calendarRef.current?.getApi();
-    if (!api) return;
-    if (isMobile) {
-      api.changeView("listWeek");
-    } else {
-      api.changeView(initialView || "dayGridMonth");
-    }
-  }, [isMobile, initialView]);
 
   if (isLoading) return <CardSkeleton />;
 
@@ -59,7 +55,6 @@ export function CalendarView({
 
   return (
     <FullCalendar
-      ref={calendarRef}
       plugins={[dayGridPlugin, listPlugin, interactionPlugin]}
       initialView={isMobile ? "listWeek" : initialView || "dayGridMonth"}
       headerToolbar={

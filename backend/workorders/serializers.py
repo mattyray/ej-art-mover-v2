@@ -74,8 +74,20 @@ class WorkOrderDetailSerializer(serializers.ModelSerializer):
         ]
 
 
+class NestedEventSerializer(serializers.ModelSerializer):
+    """Event serializer for nested use inside WorkOrder create/update — work_order is not required."""
+    id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Event
+        fields = [
+            'id', 'event_type', 'address', 'date',
+            'daily_order', 'scheduled_time', 'completed',
+        ]
+
+
 class WorkOrderCreateUpdateSerializer(serializers.ModelSerializer):
-    events = EventSerializer(many=True, required=False)
+    events = NestedEventSerializer(many=True, required=False)
 
     class Meta:
         model = WorkOrder
