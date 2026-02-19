@@ -3,12 +3,13 @@ import { toast } from "sonner";
 import api from "@/lib/api";
 import type { Client, ClientInput, PaginatedResponse } from "@/types";
 
-export function useClients(search?: string) {
+export function useClients(search?: string, page?: number) {
   return useQuery({
-    queryKey: ["clients", { search }],
+    queryKey: ["clients", { search, page }],
     queryFn: async () => {
       const params: Record<string, string> = {};
       if (search) params.search = search;
+      if (page && page > 1) params.page = String(page);
       const { data } = await api.get<PaginatedResponse<Client>>("/clients/", {
         params,
       });

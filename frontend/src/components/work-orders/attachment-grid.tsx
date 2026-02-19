@@ -134,7 +134,7 @@ export function AttachmentGrid({ workOrderId, attachments }: AttachmentGridProps
                 <Button
                   variant="destructive"
                   size="icon"
-                  className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 h-6 w-6 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
                 >
                   <Trash2 className="h-3 w-3" />
                 </Button>

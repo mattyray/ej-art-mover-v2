@@ -29,7 +29,9 @@ import {
   useChangeInvoiceStatus,
   useDeleteInvoice,
 } from "@/hooks/use-invoices";
+import { EmptyState } from "@/components/empty-state";
 import {
+  AlertCircle,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -49,13 +51,20 @@ export default function InvoiceDetailPage({
   const { id } = use(params);
   const invoiceId = Number(id);
   const router = useRouter();
-  const { data: invoice, isLoading } = useInvoice(invoiceId);
+  const { data: invoice, isLoading, isError } = useInvoice(invoiceId);
   const advanceStatus = useAdvanceInvoiceStatus();
   const changeStatus = useChangeInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
 
   if (isLoading) return <DetailSkeleton />;
-  if (!invoice) return null;
+  if (isError || !invoice) return (
+    <EmptyState
+      icon={AlertCircle}
+      title="Invoice not found"
+      description="This invoice may have been deleted or you don't have access."
+      action={<Button variant="outline" onClick={() => router.push("/invoices")}>Back to Invoices</Button>}
+    />
+  );
 
   function handleAdvanceStatus() {
     advanceStatus.mutate(invoiceId);

@@ -18,7 +18,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useWorkOrder } from "@/hooks/use-work-orders";
+import { EmptyState } from "@/components/empty-state";
 import {
+  AlertCircle,
   ArrowLeft,
   CalendarDays,
   Paperclip,
@@ -36,10 +38,17 @@ export default function WorkOrderDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const workOrderId = Number(id);
-  const { data: workOrder, isLoading } = useWorkOrder(workOrderId);
+  const { data: workOrder, isLoading, isError } = useWorkOrder(workOrderId);
 
   if (isLoading) return <DetailSkeleton />;
-  if (!workOrder) return null;
+  if (isError || !workOrder) return (
+    <EmptyState
+      icon={AlertCircle}
+      title="Work order not found"
+      description="This work order may have been deleted or you don't have access."
+      action={<Button variant="outline" onClick={() => router.push("/work-orders")}>Back to Work Orders</Button>}
+    />
+  );
 
   return (
     <div className="space-y-6">

@@ -130,22 +130,26 @@ export default function WorkOrdersPage() {
               <WorkOrderSection
                 title="Pending"
                 workOrders={pendingQuery.data?.results || []}
+                totalCount={pendingQuery.data?.count}
                 isLoading={pendingQuery.isLoading}
               />
               <WorkOrderSection
                 title="Scheduled"
                 workOrders={scheduledQuery.data?.results || []}
+                totalCount={scheduledQuery.data?.count}
                 isLoading={scheduledQuery.isLoading}
               />
               <WorkOrderSection
                 title="Completed (Uninvoiced)"
                 workOrders={completedUninvoicedQuery.data?.results || []}
+                totalCount={completedUninvoicedQuery.data?.count}
                 isLoading={completedUninvoicedQuery.isLoading}
                 defaultOpen={false}
               />
               <WorkOrderSection
                 title="Completed (Invoiced)"
                 workOrders={completedInvoicedQuery.data?.results || []}
+                totalCount={completedInvoicedQuery.data?.count}
                 isLoading={completedInvoicedQuery.isLoading}
                 defaultOpen={false}
               />

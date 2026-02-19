@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useClient, useDeleteClient } from "@/hooks/use-clients";
 import { useWorkOrders } from "@/hooks/use-work-orders";
 import {
+  AlertCircle,
   Pencil,
   Trash2,
   Mail,
@@ -30,12 +31,19 @@ export default function ClientDetailPage({
   const { id } = use(params);
   const clientId = Number(id);
   const router = useRouter();
-  const { data: client, isLoading } = useClient(clientId);
+  const { data: client, isLoading, isError } = useClient(clientId);
   const { data: workOrdersData } = useWorkOrders({ client: clientId });
   const deleteClient = useDeleteClient();
 
   if (isLoading) return <DetailSkeleton />;
-  if (!client) return null;
+  if (isError || !client) return (
+    <EmptyState
+      icon={AlertCircle}
+      title="Client not found"
+      description="This client may have been deleted or you don't have access."
+      action={<Button variant="outline" onClick={() => router.push("/clients")}>Back to Clients</Button>}
+    />
+  );
 
   const workOrders = workOrdersData?.results || [];
 

@@ -1,4 +1,4 @@
-from django.db.models import F, Max
+from django.db.models import Count, F, Max
 from rest_framework import viewsets, filters
 from .models import Client
 from .serializers import ClientSerializer
@@ -12,5 +12,6 @@ class ClientViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Client.objects.annotate(
-            last_activity=Max('work_orders__updated_at')
+            last_activity=Max('work_orders__updated_at'),
+            work_order_count=Count('work_orders'),
         ).order_by(F('last_activity').desc(nulls_last=True), 'name')

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useCalendarEvents } from "@/hooks/use-calendar";
 import { CardSkeleton } from "@/components/loading-skeleton";
@@ -18,9 +19,14 @@ export function CalendarView({
   height = "auto",
 }: CalendarViewProps) {
   const router = useRouter();
-  const { data: events, isLoading } = useCalendarEvents();
+  const [dateRange, setDateRange] = useState<{ start?: string; end?: string }>({});
+  const { data: events, isLoading } = useCalendarEvents(dateRange.start, dateRange.end);
 
-  if (isLoading) return <CardSkeleton />;
+  const handleDatesSet = useCallback((start: string, end: string) => {
+    setDateRange({ start, end });
+  }, []);
+
+  if (isLoading && !events) return <CardSkeleton />;
 
   const calendarEvents = (events || []).map((e) => ({
     id: e.id,
@@ -55,6 +61,7 @@ export function CalendarView({
       onDayClick={(date) => {
         router.push(`/calendar/day/${format(date, "yyyy-MM-dd")}`);
       }}
+      onDatesSet={handleDatesSet}
     />
   );
 }

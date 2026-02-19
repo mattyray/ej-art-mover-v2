@@ -25,11 +25,13 @@ import type { WorkOrderListItem } from "@/types";
 export function WorkOrderSection({
   title,
   workOrders,
+  totalCount,
   isLoading,
   defaultOpen = true,
 }: {
   title: string;
   workOrders: WorkOrderListItem[];
+  totalCount?: number;
   isLoading: boolean;
   defaultOpen?: boolean;
 }) {
@@ -42,7 +44,7 @@ export function WorkOrderSection({
         <span className="font-semibold">
           {title}{" "}
           <span className="text-muted-foreground font-normal">
-            ({workOrders.length})
+            ({totalCount ?? workOrders.length})
           </span>
         </span>
         <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform [[data-state=open]>svg&]:rotate-180" />

@@ -13,6 +13,7 @@ interface CalendarInnerProps {
   onEventClick: (workOrderId: number) => void;
   onDateClick: (dateStr: string) => void;
   onDayClick: (date: Date) => void;
+  onDatesSet?: (start: string, end: string) => void;
 }
 
 export default function CalendarInner({
@@ -23,6 +24,7 @@ export default function CalendarInner({
   onEventClick,
   onDateClick,
   onDayClick,
+  onDatesSet,
 }: CalendarInnerProps) {
   return (
     <FullCalendar
@@ -42,6 +44,9 @@ export default function CalendarInner({
       }}
       dateClick={(info) => {
         onDateClick(info.dateStr);
+      }}
+      datesSet={(info) => {
+        onDatesSet?.(info.startStr, info.endStr);
       }}
       navLinks={true}
       navLinkDayClick={(date) => {

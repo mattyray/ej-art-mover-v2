@@ -14,16 +14,22 @@ COMPLETED_COLOR = "#6c757d"
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def calendar_events(request):
-    """Return all scheduled events as calendar-compatible JSON"""
+    """Return scheduled events as calendar-compatible JSON. Supports ?start=&end= date range filtering."""
     events = Event.objects.filter(
         date__isnull=False
     ).select_related('work_order__client').order_by('date', 'daily_order', 'scheduled_time')
 
+    start = request.query_params.get('start')
+    end = request.query_params.get('end')
+    if start:
+        events = events.filter(date__gte=start[:10])
+    if end:
+        events = events.filter(date__lte=end[:10])
+
     data = []
     for event in events:
         wo = event.work_order
-        daily_prefix = f"{event.daily_order}. " if event.daily_order else ""
-        title = f"{daily_prefix}{event.get_event_type_display()} - {wo.client.name}"
+        title = f"{event.get_event_type_display()} - {wo.client.name}"
 
         color = COMPLETED_COLOR if event.completed else COLORS[wo.id % len(COLORS)]
 

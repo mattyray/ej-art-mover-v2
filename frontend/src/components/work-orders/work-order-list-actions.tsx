@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import {
   MoreVertical,
   CheckCircle,
@@ -113,7 +114,7 @@ export function WorkOrderListActions({ workOrder }: WorkOrderListActionsProps) {
             <DropdownMenuItem
               onClick={(e) => {
                 stop(e);
-                router.push(`/invoices/new?work_order=${id}`);
+                router.push(`/invoices/new?work_order=${id}&client=${client}`);
               }}
             >
               <FileText className="h-4 w-4" />
@@ -176,18 +177,23 @@ export function WorkOrderListActions({ workOrder }: WorkOrderListActionsProps) {
           <Pencil className="h-4 w-4" />
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem
+        <ConfirmDialog
+          trigger={
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={(e) => e.preventDefault()}
+              onClick={stop}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          }
+          title="Delete Work Order"
+          description={`This will permanently delete work order #${id} and all its events, attachments, and notes.`}
+          confirmLabel="Delete"
           variant="destructive"
-          onClick={(e) => {
-            stop(e);
-            if (confirm(`Delete work order #${id}?`)) {
-              deleteWorkOrder.mutate(id);
-            }
-          }}
-        >
-          <Trash2 className="h-4 w-4" />
-          Delete
-        </DropdownMenuItem>
+          onConfirm={() => deleteWorkOrder.mutate(id)}
+        />
       </DropdownMenuContent>
     </DropdownMenu>
   );

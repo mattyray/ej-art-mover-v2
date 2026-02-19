@@ -56,7 +56,7 @@ class WorkOrderListSerializer(serializers.ModelSerializer):
         ]
 
     def get_event_count(self, obj):
-        return obj.events.count()
+        return len(obj.events.all())
 
 
 class WorkOrderDetailSerializer(serializers.ModelSerializer):
@@ -83,7 +83,7 @@ class NestedEventSerializer(serializers.ModelSerializer):
         model = Event
         fields = [
             'id', 'event_type', 'address', 'date',
-            'daily_order', 'scheduled_time', 'completed',
+            'daily_order', 'scheduled_time',
         ]
 
 
@@ -96,6 +96,7 @@ class WorkOrderCreateUpdateSerializer(serializers.ModelSerializer):
             'id', 'client', 'job_description', 'estimated_cost',
             'status', 'invoiced', 'events',
         ]
+        read_only_fields = ['status', 'invoiced']
 
     def create(self, validated_data):
         events_data = validated_data.pop('events', [])

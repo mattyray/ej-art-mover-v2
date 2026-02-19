@@ -25,8 +25,8 @@ export function clearTokens(): void {
 export function isTokenExpired(token: string): boolean {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    // Add 10 second buffer
-    return payload.exp * 1000 < Date.now() - 10000;
+    // Consider expired 10 seconds before actual expiry to allow for refresh
+    return payload.exp * 1000 < Date.now() + 10000;
   } catch {
     return true;
   }

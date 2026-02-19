@@ -15,6 +15,9 @@ export default function NewInvoicePage() {
   const prefillWorkOrderId = searchParams.get("work_order")
     ? Number(searchParams.get("work_order"))
     : undefined;
+  const prefillClientId = searchParams.get("client")
+    ? Number(searchParams.get("client"))
+    : undefined;
 
   async function handleSubmit(values: InvoiceFormValues) {
     const data = await createInvoice.mutateAsync(values);
@@ -27,6 +30,7 @@ export default function NewInvoicePage() {
       <Card>
         <CardContent className="pt-6">
           <InvoiceForm
+            prefillClientId={prefillClientId}
             prefillWorkOrderId={prefillWorkOrderId}
             onSubmit={handleSubmit}
             isSubmitting={createInvoice.isPending}

@@ -47,9 +47,9 @@ class WorkOrder(models.Model):
         blank=True,
         null=True
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
     completed_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
     invoiced = models.BooleanField(default=False)
 
@@ -77,7 +77,7 @@ class Event(models.Model):
     work_order = models.ForeignKey(WorkOrder, on_delete=models.CASCADE, related_name='events')
     event_type = models.CharField(max_length=30, choices=EVENT_TYPES)
     address = models.CharField(max_length=255, blank=True)
-    date = models.DateField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True, db_index=True)
     daily_order = models.PositiveIntegerField(blank=True, null=True, help_text='Order of this event within the day')
     scheduled_time = models.TimeField(blank=True, null=True, help_text='Scheduled time for this event')
 

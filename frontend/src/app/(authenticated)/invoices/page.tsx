@@ -50,7 +50,7 @@ function InvoiceSection({
     <Collapsible defaultOpen={status !== "paid"}>
       <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md border p-3 font-medium hover:bg-accent/50">
         <span>
-          {label} ({invoices.length})
+          {label} ({data?.count ?? invoices.length})
         </span>
         <ChevronDown className="h-4 w-4 transition-transform [[data-state=open]_&]:rotate-180" />
       </CollapsibleTrigger>

@@ -25,13 +25,16 @@ import { Plus, Users, ClipboardList } from "lucide-react";
 export default function ClientsPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const { data, isLoading } = useClients(search || undefined);
+  const [page, setPage] = useState(1);
+  const { data, isLoading } = useClients(search || undefined, page);
 
   const handleSearch = useCallback((value: string) => {
     setSearch(value);
+    setPage(1);
   }, []);
 
   const clients = data?.results || [];
+  const totalPages = data ? Math.ceil(data.count / 20) : 1;
 
   return (
     <div className="space-y-4">
@@ -118,6 +121,33 @@ export default function ClientsPage() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-2">
+              <p className="text-sm text-muted-foreground">
+                Page {page} of {totalPages} ({data?.count} clients)
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </>
       )}
 

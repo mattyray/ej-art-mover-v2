@@ -62,7 +62,7 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
 
   function handleCompleteAndInvoice() {
     completeAndInvoice.mutate(id, {
-      onSuccess: () => router.push(`/invoices/new?work_order=${id}`),
+      onSuccess: () => router.push(`/invoices/new?work_order=${id}&client=${workOrder.client}`),
     });
   }
 
@@ -146,7 +146,7 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
     actions.push({
       label: "Create Invoice",
       icon: <Receipt className="h-4 w-4" />,
-      href: `/invoices/new?work_order=${id}`,
+      href: `/invoices/new?work_order=${id}&client=${workOrder.client}`,
     });
     actions.push({
       label: "Mark Invoiced",
