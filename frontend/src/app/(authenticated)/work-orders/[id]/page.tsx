@@ -4,8 +4,8 @@ import { use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
-import { StatusBadge, InvoicedBadge } from "@/components/status-badge";
 import { DetailSkeleton } from "@/components/loading-skeleton";
+import { WorkOrderStepper } from "@/components/work-orders/work-order-stepper";
 import { EventList } from "@/components/work-orders/event-list";
 import { AttachmentGrid } from "@/components/work-orders/attachment-grid";
 import { NoteList } from "@/components/work-orders/note-list";
@@ -66,19 +66,20 @@ export default function WorkOrderDetailPage({
         actions={<WorkOrderActions workOrder={workOrder} />}
       />
 
-      {/* Status & Info */}
+      {/* Lifecycle Stepper */}
+      <Card>
+        <CardContent className="pt-6 pb-5">
+          <WorkOrderStepper
+            status={workOrder.status}
+            invoiced={workOrder.invoiced}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Info */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-4">
-            <div className="space-y-1">
-              <p className="text-xs text-muted-foreground">Status</p>
-              <div className="flex items-center gap-2">
-                <StatusBadge status={workOrder.status} type="workOrder" />
-                {workOrder.status === "completed" && (
-                  <InvoicedBadge invoiced={workOrder.invoiced} />
-                )}
-              </div>
-            </div>
             {workOrder.estimated_cost && (
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">Estimated Cost</p>

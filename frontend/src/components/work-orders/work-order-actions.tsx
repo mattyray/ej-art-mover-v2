@@ -22,6 +22,7 @@ import {
   useMarkCompleted,
   useMarkPaid,
   useCompleteAndInvoice,
+  useChangeWorkOrderStatus,
   useResetInvoiced,
   useDeleteWorkOrder,
 } from "@/hooks/use-work-orders";
@@ -32,6 +33,7 @@ import {
   CheckCircle,
   Receipt,
   RotateCcw,
+  Undo2,
 } from "lucide-react";
 import type { WorkOrderDetail } from "@/types";
 
@@ -44,6 +46,7 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
   const markCompleted = useMarkCompleted();
   const markPaid = useMarkPaid();
   const completeAndInvoice = useCompleteAndInvoice();
+  const changeStatus = useChangeWorkOrderStatus();
   const resetInvoiced = useResetInvoiced();
   const deleteWorkOrder = useDeleteWorkOrder();
 
@@ -65,6 +68,10 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
     markPaid.mutate(id);
   }
 
+  function handleRevertToInProgress() {
+    changeStatus.mutate({ id, status: "in_progress" });
+  }
+
   function handleResetInvoiced() {
     resetInvoiced.mutate(id);
   }
@@ -75,21 +82,14 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
     });
   }
 
-  // Build action list based on current state
+  // Build action list — next lifecycle step always first
   const actions: {
     label: string;
     icon: React.ReactNode;
     onClick?: () => void;
     href?: string;
-    variant?: "destructive";
-    confirm?: { title: string; description: string };
+    separator?: boolean;
   }[] = [];
-
-  actions.push({
-    label: "Edit",
-    icon: <Pencil className="h-4 w-4" />,
-    href: `/work-orders/${id}/edit`,
-  });
 
   if (status !== "completed") {
     actions.push({
@@ -115,6 +115,16 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
       icon: <CheckCircle className="h-4 w-4" />,
       onClick: handleMarkPaid,
     });
+    actions.push({
+      separator: true,
+      label: "",
+      icon: null,
+    });
+    actions.push({
+      label: "Revert to In Progress",
+      icon: <Undo2 className="h-4 w-4" />,
+      onClick: handleRevertToInProgress,
+    });
   }
 
   if (status === "completed" && invoiced) {
@@ -123,7 +133,28 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
       icon: <RotateCcw className="h-4 w-4" />,
       onClick: handleResetInvoiced,
     });
+    actions.push({
+      separator: true,
+      label: "",
+      icon: null,
+    });
+    actions.push({
+      label: "Revert to In Progress",
+      icon: <Undo2 className="h-4 w-4" />,
+      onClick: handleRevertToInProgress,
+    });
   }
+
+  actions.push({
+    separator: true,
+    label: "",
+    icon: null,
+  });
+  actions.push({
+    label: "Edit",
+    icon: <Pencil className="h-4 w-4" />,
+    href: `/work-orders/${id}/edit`,
+  });
 
   const deleteAction = {
     label: "Delete",
@@ -147,8 +178,10 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {actions.map((action) =>
-              action.href ? (
+            {actions.map((action, i) =>
+              action.separator ? (
+                <DropdownMenuSeparator key={`sep-${i}`} />
+              ) : action.href ? (
                 <DropdownMenuItem key={action.label} asChild>
                   <Link href={action.href} className="gap-2">
                     {action.icon}
@@ -166,7 +199,6 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
                 </DropdownMenuItem>
               )
             )}
-            <DropdownMenuSeparator />
             <ConfirmDialog
               trigger={
                 <DropdownMenuItem
@@ -200,8 +232,10 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
               <DrawerTitle>Work Order Actions</DrawerTitle>
             </DrawerHeader>
             <div className="space-y-1 px-4 pb-8">
-              {actions.map((action) =>
-                action.href ? (
+              {actions.map((action, i) =>
+                action.separator ? (
+                  <div key={`sep-${i}`} className="border-t my-1" />
+                ) : action.href ? (
                   <Link key={action.label} href={action.href}>
                     <Button
                       variant="ghost"

@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge, InvoicedBadge } from "@/components/status-badge";
+import { WorkOrderListActions } from "@/components/work-orders/work-order-list-actions";
 import { CalendarDays, ClipboardList } from "lucide-react";
 import { format } from "date-fns";
 import type { WorkOrderListItem } from "@/types";
@@ -12,43 +13,49 @@ interface WorkOrderCardProps {
 }
 
 export function WorkOrderCard({ workOrder }: WorkOrderCardProps) {
+  const router = useRouter();
+
   return (
-    <Link href={`/work-orders/${workOrder.id}`}>
-      <Card className="transition-colors hover:bg-accent/50">
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0 space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">WO #{workOrder.id}</span>
-                <span className="text-sm text-muted-foreground">
-                  {workOrder.client_name}
-                </span>
-              </div>
-              {workOrder.job_description && (
-                <p className="text-sm text-muted-foreground truncate">
-                  {workOrder.job_description}
-                </p>
-              )}
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <CalendarDays className="h-3 w-3" />
-                  {format(new Date(workOrder.created_at), "MMM d, yyyy")}
-                </span>
-                <span className="flex items-center gap-1">
-                  <ClipboardList className="h-3 w-3" />
-                  {workOrder.event_count} event{workOrder.event_count !== 1 ? "s" : ""}
-                </span>
-              </div>
+    <Card
+      className="transition-colors hover:bg-accent/50 cursor-pointer"
+      onClick={() => router.push(`/work-orders/${workOrder.id}`)}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">WO #{workOrder.id}</span>
+              <span className="text-sm text-muted-foreground">
+                {workOrder.client_name}
+              </span>
             </div>
-            <div className="flex flex-col items-end gap-1 shrink-0">
+            {workOrder.job_description && (
+              <p className="text-sm text-muted-foreground truncate">
+                {workOrder.job_description}
+              </p>
+            )}
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <CalendarDays className="h-3 w-3" />
+                {format(new Date(workOrder.created_at), "MMM d, yyyy")}
+              </span>
+              <span className="flex items-center gap-1">
+                <ClipboardList className="h-3 w-3" />
+                {workOrder.event_count} event{workOrder.event_count !== 1 ? "s" : ""}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <div className="flex flex-col items-end gap-1">
               <StatusBadge status={workOrder.status} type="workOrder" />
               {workOrder.status === "completed" && (
                 <InvoicedBadge invoiced={workOrder.invoiced} />
               )}
             </div>
+            <WorkOrderListActions workOrder={workOrder} />
           </div>
-        </CardContent>
-      </Card>
-    </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

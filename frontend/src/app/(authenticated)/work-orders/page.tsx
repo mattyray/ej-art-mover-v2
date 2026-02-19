@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/layout/page-header";
 import { WorkOrderCard } from "@/components/work-orders/work-order-card";
-import { EmptyState } from "@/components/empty-state";
 import { ListSkeleton } from "@/components/loading-skeleton";
 import { StatusBadge, InvoicedBadge } from "@/components/status-badge";
 import { Fab } from "@/components/fab";
@@ -22,8 +21,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { WorkOrderListActions } from "@/components/work-orders/work-order-list-actions";
 import { useWorkOrders } from "@/hooks/use-work-orders";
-import { Plus, ClipboardList, ChevronDown } from "lucide-react";
+import { Plus, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import type { WorkOrderListItem } from "@/types";
 
@@ -76,6 +76,7 @@ function WorkOrderSection({
                     <TableHead>Description</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Date</TableHead>
+                    <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -102,6 +103,9 @@ function WorkOrderSection({
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {format(new Date(wo.created_at), "MMM d, yyyy")}
+                      </TableCell>
+                      <TableCell>
+                        <WorkOrderListActions workOrder={wo} />
                       </TableCell>
                     </TableRow>
                   ))}
