@@ -30,7 +30,7 @@ export default function CalendarInner({
       initialView={initialView}
       headerToolbar={headerToolbar}
       views={{
-        listWeek: { buttonText: "List" },
+        listDay: { buttonText: "Day" },
         dayGridMonth: { buttonText: "Month" },
         dayGridWeek: { buttonText: "Week" },
       }}

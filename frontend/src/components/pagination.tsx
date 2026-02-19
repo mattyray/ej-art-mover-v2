@@ -4,56 +4,49 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
-  hasNext: boolean;
-  hasPrevious: boolean;
-  onNext: () => void;
-  onPrevious: () => void;
-  page?: number;
-  totalCount?: number;
+  page: number;
+  totalCount: number;
   pageSize?: number;
+  onPageChange: (page: number) => void;
 }
 
 export function Pagination({
-  hasNext,
-  hasPrevious,
-  onNext,
-  onPrevious,
   page,
   totalCount,
-  pageSize,
+  pageSize = 20,
+  onPageChange,
 }: PaginationProps) {
-  if (!hasNext && !hasPrevious) return null;
+  const totalPages = Math.ceil(totalCount / pageSize);
+  if (totalPages <= 1) return null;
 
-  const showInfo = page !== undefined && totalCount !== undefined && pageSize !== undefined;
-  const startItem = showInfo ? (page - 1) * pageSize + 1 : 0;
-  const endItem = showInfo ? Math.min(page * pageSize, totalCount) : 0;
+  const start = (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, totalCount);
 
   return (
-    <div className="flex items-center justify-between pt-4">
-      {showInfo ? (
-        <p className="text-sm text-muted-foreground">
-          {startItem}–{endItem} of {totalCount}
-        </p>
-      ) : (
-        <div />
-      )}
-      <div className="flex gap-2">
+    <div className="flex items-center justify-between gap-4 pt-4">
+      <p className="text-sm text-muted-foreground">
+        {start}–{end} of {totalCount}
+      </p>
+      <div className="flex items-center gap-2">
         <Button
           variant="outline"
           size="sm"
-          onClick={onPrevious}
-          disabled={!hasPrevious}
+          onClick={() => onPageChange(page - 1)}
+          disabled={page <= 1}
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
-          Previous
+          <span className="hidden sm:inline">Previous</span>
         </Button>
+        <span className="text-sm text-muted-foreground">
+          {page} / {totalPages}
+        </span>
         <Button
           variant="outline"
           size="sm"
-          onClick={onNext}
-          disabled={!hasNext}
+          onClick={() => onPageChange(page + 1)}
+          disabled={page >= totalPages}
         >
-          Next
+          <span className="hidden sm:inline">Next</span>
           <ChevronRight className="h-4 w-4 ml-1" />
         </Button>
       </div>

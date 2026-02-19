@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCalendarEvents } from "@/hooks/use-calendar";
 import { CardSkeleton } from "@/components/loading-skeleton";
@@ -20,14 +19,6 @@ export function CalendarView({
 }: CalendarViewProps) {
   const router = useRouter();
   const { data: events, isLoading } = useCalendarEvents();
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   if (isLoading) return <CardSkeleton />;
 
@@ -46,7 +37,7 @@ export function CalendarView({
   const toolbar = headerToolbar || {
     left: "prev,next today",
     center: "title",
-    right: isMobile ? "" : "dayGridMonth,dayGridWeek,listWeek",
+    right: "dayGridMonth,dayGridWeek,listDay",
   };
 
   return (

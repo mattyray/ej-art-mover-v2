@@ -18,8 +18,10 @@ class WorkOrderViewSet(viewsets.ModelViewSet):
     queryset = WorkOrder.objects.select_related('client').prefetch_related(
         'events', 'attachments', 'notes'
     ).order_by('-created_at')
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['client__name', 'job_description']
+    ordering_fields = ['created_at', 'updated_at', 'client__name', 'status', 'id']
+    ordering = ['-created_at']
 
     def get_serializer_class(self):
         if self.action == 'list':

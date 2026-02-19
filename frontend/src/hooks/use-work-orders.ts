@@ -14,9 +14,14 @@ interface WorkOrderFilters {
   invoiced?: string;
   client?: number;
   search?: string;
+  page?: number;
+  ordering?: string;
 }
 
-export function useWorkOrders(filters?: WorkOrderFilters) {
+export function useWorkOrders(
+  filters?: WorkOrderFilters,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ["workorders", filters],
     queryFn: async () => {
@@ -25,12 +30,15 @@ export function useWorkOrders(filters?: WorkOrderFilters) {
       if (filters?.invoiced !== undefined) params.invoiced = filters.invoiced;
       if (filters?.client) params.client = String(filters.client);
       if (filters?.search) params.search = filters.search;
+      if (filters?.page) params.page = String(filters.page);
+      if (filters?.ordering) params.ordering = filters.ordering;
       const { data } = await api.get<PaginatedResponse<WorkOrderListItem>>(
         "/workorders/",
         { params }
       );
       return data;
     },
+    enabled: options?.enabled ?? true,
   });
 }
 
