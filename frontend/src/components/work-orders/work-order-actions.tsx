@@ -34,6 +34,8 @@ import {
   Receipt,
   RotateCcw,
   Undo2,
+  CalendarCheck,
+  ArrowLeft,
 } from "lucide-react";
 import type { WorkOrderDetail } from "@/types";
 
@@ -68,6 +70,14 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
     markPaid.mutate(id);
   }
 
+  function handleMarkScheduled() {
+    changeStatus.mutate({ id, status: "in_progress" });
+  }
+
+  function handleRevertToPending() {
+    changeStatus.mutate({ id, status: "pending" });
+  }
+
   function handleRevertToInProgress() {
     changeStatus.mutate({ id, status: "in_progress" });
   }
@@ -91,7 +101,12 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
     separator?: boolean;
   }[] = [];
 
-  if (status !== "completed") {
+  if (status === "pending") {
+    actions.push({
+      label: "Mark Scheduled",
+      icon: <CalendarCheck className="h-4 w-4" />,
+      onClick: handleMarkScheduled,
+    });
     actions.push({
       label: "Mark Completed",
       icon: <CheckCircle className="h-4 w-4" />,
@@ -101,6 +116,29 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
       label: "Complete & Invoice",
       icon: <Receipt className="h-4 w-4" />,
       onClick: handleCompleteAndInvoice,
+    });
+  }
+
+  if (status === "in_progress") {
+    actions.push({
+      label: "Mark Completed",
+      icon: <CheckCircle className="h-4 w-4" />,
+      onClick: handleMarkCompleted,
+    });
+    actions.push({
+      label: "Complete & Invoice",
+      icon: <Receipt className="h-4 w-4" />,
+      onClick: handleCompleteAndInvoice,
+    });
+    actions.push({
+      separator: true,
+      label: "",
+      icon: null,
+    });
+    actions.push({
+      label: "Revert to Pending",
+      icon: <ArrowLeft className="h-4 w-4" />,
+      onClick: handleRevertToPending,
     });
   }
 

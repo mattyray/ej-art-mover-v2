@@ -17,6 +17,8 @@ import {
   Trash2,
   Undo2,
   DollarSign,
+  CalendarCheck,
+  ArrowLeft,
 } from "lucide-react";
 import {
   useMarkCompleted,
@@ -56,17 +58,53 @@ export function WorkOrderListActions({ workOrder }: WorkOrderListActionsProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {/* Pending / Scheduled */}
-        {status !== "completed" && (
-          <DropdownMenuItem
-            onClick={(e) => {
-              stop(e);
-              markCompleted.mutate(id);
-            }}
-          >
-            <CheckCircle className="h-4 w-4" />
-            Mark Completed
-          </DropdownMenuItem>
+        {/* Pending */}
+        {status === "pending" && (
+          <>
+            <DropdownMenuItem
+              onClick={(e) => {
+                stop(e);
+                changeStatus.mutate({ id, status: "in_progress" });
+              }}
+            >
+              <CalendarCheck className="h-4 w-4" />
+              Mark Scheduled
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                stop(e);
+                markCompleted.mutate(id);
+              }}
+            >
+              <CheckCircle className="h-4 w-4" />
+              Mark Completed
+            </DropdownMenuItem>
+          </>
+        )}
+
+        {/* Scheduled (in_progress) */}
+        {status === "in_progress" && (
+          <>
+            <DropdownMenuItem
+              onClick={(e) => {
+                stop(e);
+                markCompleted.mutate(id);
+              }}
+            >
+              <CheckCircle className="h-4 w-4" />
+              Mark Completed
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={(e) => {
+                stop(e);
+                changeStatus.mutate({ id, status: "pending" });
+              }}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Revert to Pending
+            </DropdownMenuItem>
+          </>
         )}
 
         {/* Completed, not invoiced */}
