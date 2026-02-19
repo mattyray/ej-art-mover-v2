@@ -94,6 +94,8 @@ ej-artmover-v2/
 - Event completion toggle recalculates work order status (auto-complete/revert)
 - Calendar color based on individual event completion, not work order status
 - Calendar includes scheduled_time in start field (timed events vs all-day)
+- FullCalendar CSS loaded as static file (`src/app/fullcalendar.css`) imported in `globals.css` — bypasses FullCalendar's fragile `sheet.insertRule()` JS injection
+- Status-specific kebab menus: pending (Mark Scheduled, Mark Completed, Complete & Invoice), in_progress (Mark Completed, Complete & Invoice, Revert to Pending)
 
 ### Backend Enhancements (since initial build)
 - `EventSerializer` includes `client_name` (via `work_order.client.name`)
@@ -154,7 +156,7 @@ All endpoints require JWT Bearer token (except auth endpoints).
 - **Auth:** JWT via SimpleJWT with axios interceptors for automatic token refresh
 - **State management:** TanStack Query v5 for server state, React context for auth
 - **API client:** Axios with JWT interceptor (`src/lib/api.ts`)
-- **Calendar:** FullCalendar React component (split into CalendarView + CalendarInner; dev uses webpack not Turbopack due to FullCalendar CSS incompatibility)
+- **Calendar:** FullCalendar React component (split into CalendarView + CalendarInner; CSS extracted as static `fullcalendar.css` imported in globals.css — do NOT rely on FullCalendar's JS-based CSS injection; dev uses webpack not Turbopack)
 - **Drag-and-drop:** @dnd-kit for calendar day view event reordering
 - **Forms:** React Hook Form + Zod v4 + @hookform/resolvers
 - **UI components:** shadcn/ui (Radix primitives + Tailwind CSS v4)
@@ -169,6 +171,23 @@ The backend uses the **exact same app names** (`accounts`, `clients`, `workorder
 - `pg_dump` from the Heroku Postgres → `pg_restore` into Railway Postgres will work
 - Django will see the existing `django_migrations` table and know the schema is up to date
 - No data transformation needed
+
+### Loading Production Data
+
+Production dump is at `latest.dump` (Heroku pg_dump, custom format). To load:
+```bash
+docker cp latest.dump ej-artmover-v2-db-1:/tmp/latest.dump
+docker compose exec db dropdb -U postgres ejartmover
+docker compose exec db createdb -U postgres ejartmover
+docker compose exec db pg_restore -U postgres -d ejartmover --no-owner --no-acl /tmp/latest.dump
+# Then reset the admin password for local dev:
+docker compose exec backend python manage.py shell -c "
+from accounts.models import CustomUser
+u = CustomUser.objects.get(username='mnraynor90@gmail.com')
+u.set_password('your-local-password')
+u.save()
+"
+```
 
 ## Environment Variables
 
