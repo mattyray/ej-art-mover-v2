@@ -17,4 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD sh -c "echo PORT=$PORT && python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn django_project.wsgi:application --bind [::]:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info"
+CMD sh -c "echo PORT=$PORT && python -c \"from http.server import HTTPServer, BaseHTTPRequestHandler; \
+class H(BaseHTTPRequestHandler): \
+    def do_GET(self): self.send_response(200); self.end_headers(); self.wfile.write(b'OK') \
+    def do_POST(self): self.send_response(200); self.end_headers(); self.wfile.write(b'OK') \
+HTTPServer(('0.0.0.0', ${PORT:-8000}), H).serve_forever()\""
