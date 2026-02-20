@@ -7,7 +7,11 @@ import cloudinary.uploader
 import cloudinary.api
 
 env = Env()
-Env.read_env()
+
+BASE_DIR_FOR_ENV = Path(__file__).resolve().parent.parent
+_env_file = BASE_DIR_FOR_ENV / ".env"
+if _env_file.is_file():
+    Env.read_env(str(_env_file))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
