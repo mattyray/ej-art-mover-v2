@@ -32,9 +32,9 @@ services:
       - DJANGO_DEBUG=True
       - DJANGO_SECRET_KEY=django-insecure-dev-key-change-in-production
       - CORS_ALLOWED_ORIGINS=http://localhost:3000
-      - CLOUDINARY_CLOUD_NAME=
-      - CLOUDINARY_API_KEY=
-      - CLOUDINARY_API_SECRET=
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
 
   frontend:
     build: ./frontend

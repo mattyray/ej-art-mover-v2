@@ -177,15 +177,13 @@ class JobAttachment(models.Model):
 
     def get_file_url(self):
         try:
-            if self.file and hasattr(self.file, 'public_id') and self.file.public_id:
-                if self.file_type == 'image':
-                    return cloudinary.CloudinaryImage(self.file.public_id).build_url()
-                else:
-                    return cloudinary.CloudinaryImage(self.file.public_id).build_url(
-                        resource_type="raw"
-                    )
-            elif self.file and hasattr(self.file, 'url'):
-                return self.file.url
+            if not self.file or not self.file.name:
+                return None
+            name = self.file.name
+            if self.file_type == 'image':
+                return cloudinary.CloudinaryImage(name).build_url()
+            else:
+                return cloudinary.CloudinaryImage(name).build_url(resource_type="raw")
         except Exception:
             pass
         return None
@@ -193,14 +191,11 @@ class JobAttachment(models.Model):
     def get_thumbnail_url(self):
         if self.file_type == 'image':
             try:
-                if hasattr(self.file, 'public_id') and self.file.public_id:
-                    return cloudinary.CloudinaryImage(self.file.public_id).build_url(
-                        width=200, height=200, crop="fill", quality="auto", fetch_format="auto"
-                    )
-                elif self.thumbnail and hasattr(self.thumbnail, 'url'):
-                    return self.thumbnail.url
-                elif self.file and hasattr(self.file, 'url'):
-                    return self.file.url
+                if not self.file or not self.file.name:
+                    return None
+                return cloudinary.CloudinaryImage(self.file.name).build_url(
+                    width=200, height=200, crop="fill", quality="auto", fetch_format="auto"
+                )
             except Exception:
                 pass
         return None
@@ -208,10 +203,11 @@ class JobAttachment(models.Model):
     def get_display_url(self):
         if self.file_type == 'image':
             try:
-                if hasattr(self.file, 'public_id') and self.file.public_id:
-                    return cloudinary.CloudinaryImage(self.file.public_id).build_url(
-                        width=800, height=600, crop="limit", quality="auto", fetch_format="auto"
-                    )
+                if not self.file or not self.file.name:
+                    return None
+                return cloudinary.CloudinaryImage(self.file.name).build_url(
+                    width=800, height=600, crop="limit", quality="auto", fetch_format="auto"
+                )
             except Exception:
                 pass
         return self.get_file_url()

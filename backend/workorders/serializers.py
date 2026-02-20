@@ -46,6 +46,7 @@ class JobNoteSerializer(serializers.ModelSerializer):
 class WorkOrderListSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='client.name', read_only=True)
     event_count = serializers.SerializerMethodField()
+    attachment_count = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkOrder
@@ -53,10 +54,14 @@ class WorkOrderListSerializer(serializers.ModelSerializer):
             'id', 'client', 'client_name', 'job_description',
             'estimated_cost', 'status', 'invoiced',
             'created_at', 'updated_at', 'completed_at', 'event_count',
+            'attachment_count',
         ]
 
     def get_event_count(self, obj):
         return len(obj.events.all())
+
+    def get_attachment_count(self, obj):
+        return len(obj.attachments.all())
 
 
 class WorkOrderDetailSerializer(serializers.ModelSerializer):

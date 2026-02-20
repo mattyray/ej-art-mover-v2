@@ -68,6 +68,7 @@ export interface WorkOrderListItem {
   updated_at: string;
   completed_at: string | null;
   event_count: number;
+  attachment_count: number;
 }
 
 export interface WorkOrderDetail {

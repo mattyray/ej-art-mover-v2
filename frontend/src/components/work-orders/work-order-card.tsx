@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge, InvoicedBadge } from "@/components/status-badge";
 import { WorkOrderListActions } from "@/components/work-orders/work-order-list-actions";
-import { CalendarDays, ClipboardList } from "lucide-react";
+import { CalendarDays, ClipboardList, Paperclip } from "lucide-react";
 import { format } from "date-fns";
 import type { WorkOrderListItem } from "@/types";
 
@@ -43,6 +43,12 @@ export function WorkOrderCard({ workOrder }: WorkOrderCardProps) {
                 <ClipboardList className="h-3 w-3" />
                 {workOrder.event_count} event{workOrder.event_count !== 1 ? "s" : ""}
               </span>
+              {workOrder.attachment_count > 0 && (
+                <span className="flex items-center gap-1">
+                  <Paperclip className="h-3 w-3" />
+                  {workOrder.attachment_count}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">

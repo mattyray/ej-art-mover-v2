@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { WorkOrderListActions } from "@/components/work-orders/work-order-list-actions";
+import { Paperclip } from "lucide-react";
 import { useWorkOrders } from "@/hooks/use-work-orders";
 import { format } from "date-fns";
 
@@ -87,6 +88,12 @@ export function WorkOrderFlatList({
                     <StatusBadge status={wo.status} type="workOrder" />
                     {wo.status === "completed" && (
                       <InvoicedBadge invoiced={wo.invoiced} />
+                    )}
+                    {wo.attachment_count > 0 && (
+                      <span className="flex items-center gap-0.5 text-xs text-muted-foreground ml-1">
+                        <Paperclip className="h-3 w-3" />
+                        {wo.attachment_count}
+                      </span>
                     )}
                   </div>
                 </TableCell>
