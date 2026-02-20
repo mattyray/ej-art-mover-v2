@@ -10,6 +10,14 @@ const nextConfig: NextConfig = {
     "@fullcalendar/interaction",
     "@fullcalendar/timegrid",
   ],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
