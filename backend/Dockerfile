@@ -21,4 +21,5 @@ RUN mkdir -p /app/static /app/staticfiles
 
 EXPOSE 8080
 
-CMD sh -c "echo 'PORT='$PORT && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn django_project.wsgi:application --bind '[::]:${PORT:-8000}' --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level debug --forwarded-allow-ips='*'"
+# TEMP: bare python server to test Railway networking (no Django, no gunicorn)
+CMD ["python", "healthcheck.py"]
