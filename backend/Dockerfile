@@ -17,8 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD sh -c "echo PORT=$PORT && python -c \"from http.server import HTTPServer, BaseHTTPRequestHandler; \
-class H(BaseHTTPRequestHandler): \
-    def do_GET(self): self.send_response(200); self.end_headers(); self.wfile.write(b'OK') \
-    def do_POST(self): self.send_response(200); self.end_headers(); self.wfile.write(b'OK') \
-HTTPServer(('0.0.0.0', ${PORT:-8000}), H).serve_forever()\""
+CMD ["python", "test_server.py"]
