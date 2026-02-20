@@ -195,6 +195,7 @@ Extends Django's `AbstractUser`. Standard Django auth fields.
 │─────────│ │────────────│ │─────────│
 │ id (PK) │ │ id (PK)    │ │ id (PK) │
 │ wo_id   │ │ wo_id (FK) │ │ wo_id   │
+
 │ type    │ │ file       │ │ note    │
 │ address │ │ file_type  │ │ created │
 │ date    │ │ file_size  │ └─────────┘
