@@ -8,6 +8,11 @@ A full rebuild of the EJ Art Mover job management app. The original is a Django 
 - **Frontend:** Next.js + React + TypeScript + Tailwind CSS
 - **Database:** PostgreSQL (same schema as original — data will be migrated via pg_dump)
 - **Deployment target:** Backend on Railway, Frontend on Netlify
+- **Production URLs:**
+  - Backend API: `https://api.ejartmover.net`
+  - Frontend App: `https://app.ejartmover.net`
+  - Health check: `https://api.ejartmover.net/health/`
+- **Domain:** `ejartmover.net` managed on Squarespace DNS
 
 The original repo lives at `~/Desktop/MattsPyProjects/art_moving_buisness` and is still running in production on Heroku. Do NOT modify it.
 
@@ -189,15 +194,45 @@ u.save()
 "
 ```
 
+## Production Deployment
+
+### Backend (Railway)
+- **Service:** `ej-art-mover-v2` in the `EJ-Art-Mover` project
+- **Root directory:** `backend` (MUST be set in Railway Settings → Source → Root Directory)
+- **Build:** Dockerfile-based (not nixpacks)
+- **Startup:** `migrate → collectstatic → gunicorn` (see `backend/Dockerfile` CMD)
+- **Port:** Railway auto-assigns PORT (typically 8080), gunicorn binds to `0.0.0.0:$PORT`
+- **SSL:** Terminated at Railway's proxy — `SECURE_SSL_REDIRECT=False` in Django, `SECURE_PROXY_SSL_HEADER` trusts `X-Forwarded-Proto`
+- **Custom domain:** `api.ejartmover.net` → CNAME to Railway-provided `.up.railway.app` domain
+- **`.dockerignore`** excludes `.env` so local dev settings don't leak into the image
+
+### Frontend (Netlify)
+- **Custom domain:** `app.ejartmover.net` → CNAME to `ej-art-mover.netlify.app`
+
+### DNS (Squarespace)
+- `api` CNAME → Railway `.up.railway.app` domain
+- `app` CNAME → `ej-art-mover.netlify.app`
+- `_railway-verify.api` TXT → Railway domain verification token
+- `www` / `@` → Heroku (original app, still in production)
+
 ## Environment Variables
 
-### Backend (.env)
-- `DATABASE_URL` — Postgres connection string
+### Backend — Local (.env)
+- `DATABASE_URL` — Postgres connection string (Docker: `postgres://postgres:postgres@db:5432/ejartmover`)
 - `DJANGO_SECRET_KEY` — Django secret key
 - `DJANGO_DEBUG` — True/False
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 - `CORS_ALLOWED_ORIGINS` — Comma-separated frontend URLs
 
+### Backend — Production (Railway env vars)
+- `DATABASE_URL` — `${{Postgres.DATABASE_URL}}` (Railway template reference)
+- `DJANGO_SECRET_KEY` — Production secret key
+- `DJANGO_DEBUG` — `False`
+- `DJANGO_ALLOWED_HOSTS` — `api.ejartmover.net,.railway.app`
+- `CORS_ALLOWED_ORIGINS` — `https://app.ejartmover.net`
+- `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+- `RAILWAY_PUBLIC_DOMAIN` — Auto-injected by Railway, appended to ALLOWED_HOSTS
+
 ### Frontend (.env.local)
-- `NEXT_PUBLIC_API_URL` — Backend API base URL (e.g., `http://localhost:8000/api`)
+- `NEXT_PUBLIC_API_URL` — Backend API base URL (local: `http://localhost:8000/api`, prod: `https://api.ejartmover.net/api`)
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` — Google Maps API key (for Places autocomplete)
