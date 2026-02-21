@@ -19,7 +19,4 @@ COPY . .
 
 RUN mkdir -p /app/static /app/staticfiles
 
-EXPOSE 8080
-
-# TEMP: bare python server to test Railway networking (no Django, no gunicorn)
-CMD ["python", "healthcheck.py"]
+CMD sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn django_project.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --forwarded-allow-ips='*'"
