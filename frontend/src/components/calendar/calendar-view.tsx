@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCalendarEvents } from "@/hooks/use-calendar";
 import { CardSkeleton } from "@/components/loading-skeleton";
-import CalendarInner from "./calendar-inner";
 import { format } from "date-fns";
+
+const CalendarInner = dynamic(() => import("./calendar-inner"), { ssr: false });
 
 interface CalendarViewProps {
   initialView?: string;
