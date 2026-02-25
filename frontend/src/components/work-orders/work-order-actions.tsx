@@ -29,6 +29,7 @@ import {
 import {
   MoreHorizontal,
   Pencil,
+  Printer,
   Trash2,
   CheckCircle,
   Receipt,
@@ -37,6 +38,7 @@ import {
   CalendarCheck,
   ArrowLeft,
 } from "lucide-react";
+import { openPdf } from "@/lib/pdf";
 import type { WorkOrderDetail } from "@/types";
 
 interface WorkOrderActionsProps {
@@ -192,6 +194,11 @@ export function WorkOrderActions({ workOrder }: WorkOrderActionsProps) {
     label: "Edit",
     icon: <Pencil className="h-4 w-4" />,
     href: `/work-orders/${id}/edit`,
+  });
+  actions.push({
+    label: "Print",
+    icon: <Printer className="h-4 w-4" />,
+    onClick: () => openPdf(`/workorders/${id}/pdf/`),
   });
 
   const deleteAction = {

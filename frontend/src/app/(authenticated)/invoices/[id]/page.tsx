@@ -34,6 +34,7 @@ import {
   AlertCircle,
   MoreHorizontal,
   Pencil,
+  Printer,
   Trash2,
   ArrowRight,
   DollarSign,
@@ -41,6 +42,7 @@ import {
   User,
   ClipboardList,
 } from "lucide-react";
+import { openPdf } from "@/lib/pdf";
 import { format, parseISO } from "date-fns";
 
 export default function InvoiceDetailPage({
@@ -91,6 +93,14 @@ export default function InvoiceDetailPage({
           Edit
         </Button>
       </Link>
+      <Button
+        variant="ghost"
+        className="w-full justify-start gap-3 py-3"
+        onClick={() => openPdf(`/invoices/${invoiceId}/pdf/`)}
+      >
+        <Printer className="h-4 w-4" />
+        Print Invoice
+      </Button>
       {nextStatus && (
         <Button
           variant="ghost"
@@ -157,6 +167,13 @@ export default function InvoiceDetailPage({
                       <Pencil className="h-4 w-4" />
                       Edit
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => openPdf(`/invoices/${invoiceId}/pdf/`)}
+                    className="gap-2"
+                  >
+                    <Printer className="h-4 w-4" />
+                    Print Invoice
                   </DropdownMenuItem>
                   {nextStatus && (
                     <DropdownMenuItem

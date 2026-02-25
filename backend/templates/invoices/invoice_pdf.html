@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice #{{ invoice.invoice_number }}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      color: #333;
+      font-size: 12pt;
+      line-height: 1.4;
+      margin: 0;
+      padding: 15mm;
+      background: white;
+    }
+
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+        font-size: 11pt;
+      }
+      .section {
+        break-inside: avoid;
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20pt;
+      border-bottom: 2pt solid #28a745;
+      padding-bottom: 10pt;
+    }
+
+    .logo {
+      font-size: 18pt;
+      font-weight: bold;
+      margin-bottom: 5pt;
+    }
+
+    .invoice-title {
+      font-size: 24pt;
+      margin: 0;
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    .invoice-info {
+      overflow: hidden;
+      margin-bottom: 20pt;
+      background-color: #f8f9fa;
+      padding: 10pt;
+      border-radius: 5pt;
+      border-left: 4pt solid #28a745;
+    }
+
+    .invoice-info-left {
+      float: left;
+      width: 50%;
+    }
+
+    .invoice-info-right {
+      float: right;
+      width: 50%;
+      text-align: right;
+    }
+
+    .section {
+      margin-bottom: 15pt;
+      break-inside: avoid;
+    }
+
+    .section-title {
+      background-color: #f8f9fa;
+      border-left: 4pt solid #28a745;
+      padding: 8pt 12pt;
+      margin-bottom: 10pt;
+      font-size: 14pt;
+      font-weight: bold;
+      color: #495057;
+    }
+
+    .info-item {
+      margin-bottom: 8pt;
+      overflow: hidden;
+      clear: both;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #495057;
+      display: inline-block;
+      width: 110pt;
+      vertical-align: top;
+      float: left;
+    }
+
+    .info-value {
+      display: block;
+      margin-left: 120pt;
+      word-wrap: break-word;
+    }
+
+    /* Two column layout using float */
+    .two-column {
+      width: 100%;
+      overflow: hidden;
+      margin-bottom: 10pt;
+    }
+
+    .column {
+      width: 48%;
+      float: left;
+      margin-right: 4%;
+    }
+
+    .column:last-child {
+      margin-right: 0;
+    }
+
+    .clearfix::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    .status-badge {
+      padding: 3pt 8pt;
+      border-radius: 3pt;
+      font-size: 10pt;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    .status-unpaid {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .status-in-quickbooks {
+      background-color: #ffc107;
+      color: #212529;
+    }
+
+    .status-paid {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .amount-section {
+      background-color: #e9ecef;
+      border: 2pt solid #28a745;
+      border-radius: 5pt;
+      padding: 15pt;
+      text-align: center;
+      margin: 15pt 0;
+    }
+
+    .amount-label {
+      font-size: 14pt;
+      color: #495057;
+      margin-bottom: 5pt;
+    }
+
+    .amount-value {
+      font-size: 24pt;
+      font-weight: bold;
+      color: #28a745;
+    }
+
+    .event-item {
+      background-color: #f8f9fa;
+      border: 1pt solid #dee2e6;
+      border-radius: 3pt;
+      padding: 8pt;
+      margin-bottom: 8pt;
+    }
+
+    .event-type {
+      font-weight: bold;
+      color: #28a745;
+      margin-bottom: 3pt;
+    }
+
+    .event-details {
+      font-size: 10pt;
+      color: #6c757d;
+    }
+
+    .notes-section {
+      background-color: #fff3cd;
+      border: 1pt solid #ffeaa7;
+      border-radius: 3pt;
+      padding: 10pt;
+      margin: 10pt 0;
+    }
+
+    .work-order-link {
+      background-color: #d1ecf1;
+      border: 1pt solid #bee5eb;
+      border-radius: 3pt;
+      padding: 10pt;
+      margin: 10pt 0;
+    }
+
+    .footer {
+      margin-top: 20pt;
+      padding-top: 10pt;
+      border-top: 1pt solid #dee2e6;
+      text-align: center;
+      font-size: 10pt;
+      color: #6c757d;
+    }
+
+    p {
+      margin-bottom: 5pt;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo">EJ Art Moving</div>
+    <h1 class="invoice-title">Invoice #{{ invoice.invoice_number }}</h1>
+  </div>
+
+  <!-- Invoice Summary -->
+  <div class="invoice-info clearfix">
+    <div class="invoice-info-left">
+      <h3 style="margin: 0 0 5pt 0; color: #28a745;">Invoice Information</h3>
+      <div><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</div>
+      <div><strong>Date Created:</strong> {{ invoice.date_created|date:"F j, Y" }}</div>
+    </div>
+    <div class="invoice-info-right">
+      <div><strong>Status:</strong>
+        <span class="status-badge
+          {% if invoice.status == 'unpaid' %}status-unpaid
+          {% elif invoice.status == 'in_quickbooks' %}status-in-quickbooks
+          {% else %}status-paid{% endif %}">
+          {{ invoice.get_status_display }}
+        </span>
+      </div>
+      {% if invoice.work_order %}
+        <div style="margin-top: 5pt;"><strong>Work Order:</strong> #{{ invoice.work_order.id }}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Client Information -->
+  <div class="section">
+    <div class="section-title">Bill To</div>
+    <div class="two-column clearfix">
+      <div class="column">
+        <div class="info-item">
+          <span class="info-label">Name:</span>
+          <span class="info-value">{{ invoice.client.name }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span class="info-value">{{ invoice.client.email|default:"Not provided" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Phone:</span>
+          <span class="info-value">{{ invoice.client.phone|default:"Not provided" }}</span>
+        </div>
+      </div>
+      <div class="column">
+        <div class="info-item">
+          <span class="info-label">Service Address:</span>
+          <span class="info-value">{{ invoice.client.address|default:"Not provided" }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Billing Address:</span>
+          <span class="info-value">{{ invoice.client.billing_address|default:"Not provided" }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work Order Information (if linked) -->
+  {% if invoice.work_order %}
+  <div class="section">
+    <div class="section-title">Work Order Details</div>
+    <div class="work-order-link">
+      <div class="two-column clearfix">
+        <div class="column">
+          <div class="info-item">
+            <span class="info-label">Work Order ID:</span>
+            <span class="info-value">#{{ invoice.work_order.id }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Description:</span>
+            <span class="info-value">{{ invoice.work_order.job_description|default:"No description provided" }}</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="info-item">
+            <span class="info-label">Status:</span>
+            <span class="info-value">{{ invoice.work_order.get_status_display }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Completed:</span>
+            <span class="info-value">
+              {% if invoice.work_order.completed_at %}
+                {{ invoice.work_order.completed_at|date:"F j, Y" }}
+              {% else %}
+                Not completed
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scheduled Events (if work order has events) -->
+  {% if events %}
+  <div class="section">
+    <div class="section-title">Services Provided</div>
+    {% for event in events %}
+      <div class="event-item">
+        <div class="event-type">{{ event.get_event_type_display }}</div>
+        <div class="event-details">
+          {% if event.address %}
+            <strong>Location:</strong> {{ event.address }}<br>
+          {% endif %}
+          {% if event.date %}
+            <strong>Date:</strong> {{ event.date|date:"F j, Y" }}
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endif %}
+
+  <!-- Invoice Amount -->
+  <div class="amount-section">
+    <div class="amount-label">Total Amount Due</div>
+    <div class="amount-value">${{ invoice.amount }}</div>
+  </div>
+
+  <!-- Notes -->
+  {% if invoice.notes %}
+  <div class="section">
+    <div class="section-title">Notes</div>
+    <div class="notes-section">
+      {{ invoice.notes|linebreaks }}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Payment Information -->
+  <div class="section">
+    <div class="section-title">Payment Information</div>
+    <div style="background-color: #f8f9fa; padding: 10pt; border-radius: 3pt;">
+      <p><strong>Please make checks payable to:</strong> EJ Art Moving</p>
+      <p><strong>Questions about this invoice?</strong> Contact us for assistance.</p>
+      {% if invoice.status == 'unpaid' %}
+        <p style="color: #dc3545; font-weight: bold;">Payment is due upon receipt.</p>
+      {% elif invoice.status == 'paid' %}
+        <p style="color: #28a745; font-weight: bold;">This invoice has been paid. Thank you!</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Generated on {{ "now"|date:"F j, Y g:i A" }} | EJ Art Moving Business Management System</p>
+    <p>Thank you for your business!</p>
+  </div>
+
+</body>
+</html>

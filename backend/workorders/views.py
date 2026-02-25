@@ -1,8 +1,13 @@
 from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.utils import timezone
+from weasyprint import HTML
 
 from .models import WorkOrder, Event, JobAttachment, JobNote
 from .serializers import (
@@ -204,3 +209,27 @@ class JobNoteViewSet(viewsets.ModelViewSet):
         if work_order_id:
             qs = qs.filter(work_order_id=work_order_id)
         return qs
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def workorder_pdf(request, pk):
+    workorder = get_object_or_404(
+        WorkOrder.objects.select_related('client').prefetch_related(
+            'events', 'notes', 'attachments'
+        ),
+        pk=pk
+    )
+
+    html_string = render_to_string("workorders/workorder_pdf.html", {
+        "job": workorder,
+        "events": workorder.events.all().order_by('date'),
+        "notes": workorder.notes.all().order_by('-created_at'),
+        "attachments": workorder.attachments.exclude(file__exact=''),
+    })
+    html = HTML(string=html_string)
+    pdf = html.write_pdf()
+
+    response = HttpResponse(pdf, content_type="application/pdf")
+    response["Content-Disposition"] = f'inline; filename="WorkOrder_{workorder.id}.pdf"'
+    return response
